@@ -1,0 +1,41 @@
+{
+    "name": "amuncode/config",
+    "description": "Configuration management and environment loading for PHP applications.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hani Adel Farag",
+            "homepage": "https://github.com/HaniSource"
+        }
+    ],
+    "homepage": "https://github.com/AmunCode-OSS/config",
+    "support": {
+        "issues": "https://github.com/AmunCode-OSS/config/issues",
+        "source": "https://github.com/AmunCode-OSS/config"
+    },
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/finder": "^8.1",
+        "vlucas/phpdotenv": "^5.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "AmunCode\\Config\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AmunCode\\Config\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "@php vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

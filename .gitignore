@@ -1,0 +1,24 @@
+# Third-party dependencies
+/vendor/
+
+# Composer lock file
+/composer.lock
+
+# Local Composer configuration
+/.composer/
+
+# Environment configurations
+/global.env
+
+# PHPUnit cache
+/.phpunit.cache/
+
+# Code coverage
+/coverage/
+
+# IDE-specific files
+/.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
