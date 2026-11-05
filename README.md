@@ -34,6 +34,8 @@ Composer installs the required dependencies and configures the `AmunCode\Config\
 
 Load the environment before loading PHP configuration files. This allows configuration files to read environment values safely.
 
+The following example assumes the script is located in the project's `public/` directory:
+
 ```php
 <?php
 
@@ -56,6 +58,116 @@ $debug = $config->get('app.debug', false);
 ```
 
 `EnvironmentLoader` and `Config` have separate responsibilities. `EnvironmentLoader` loads environment variables; `Config` loads PHP configuration files. The `Config` constructor does not load `.env` files.
+
+## Environment file
+
+AmunCode Config uses [PHP dotenv](https://github.com/vlucas/phpdotenv) to load environment variables from a `.env` file.
+
+Create a `.env` file in your project root:
+
+```dotenv
+APP_NAME="My Application"
+APP_DEBUG=true
+APP_ENV=development
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=my_database
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+For other developers, provide an `.env.example` file with placeholder values. Do not commit your actual `.env` file or real credentials.
+
+### Loading the environment
+
+Use `EnvironmentLoader` to load the environment variables:
+
+```php
+use AmunCode\Config\EnvironmentLoader;
+
+$environment = new EnvironmentLoader();
+
+// Load .env if it exists.
+$environment->load($root);
+```
+
+By default, the `.env` file is optional. To require it:
+
+```php
+$environment->load($root, requiredFile: true);
+```
+
+When the file is required but does not exist, an exception is thrown.
+
+### Initialization order
+
+Environment variables must be loaded before PHP configuration files are initialized, especially when those files use `Env::get()`.
+
+The recommended initialization order is:
+
+1. Load the Composer autoloader.
+2. Load environment variables using `EnvironmentLoader`.
+3. Initialize `Config` to load PHP configuration files.
+4. Access configuration values.
+
+For example, consider this project structure:
+
+```text
+project/
+├── .env
+├── config/
+│   └── app.php
+├── public/
+│   └── index.php
+└── vendor/
+```
+
+Create `config/app.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use AmunCode\Config\Env;
+
+return [
+    'name' => Env::get('APP_NAME', 'My Application'),
+    'debug' => Env::get('APP_DEBUG', false),
+    'environment' => Env::get('APP_ENV', 'production'),
+];
+```
+
+Then initialize everything in `public/index.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use AmunCode\Config\Config;
+use AmunCode\Config\EnvironmentLoader;
+
+$root = dirname(__DIR__);
+
+// Load Composer autoloader.
+require $root . '/vendor/autoload.php';
+
+// Load environment variables first.
+$environment = new EnvironmentLoader();
+$environment->load($root);
+
+// Load PHP configuration files.
+$config = new Config($root . '/config');
+
+// Access configuration values.
+$appName = $config->get('app.name');
+$debug = $config->get('app.debug');
+```
+
+The `Config` class does not automatically load the `.env` file. Environment initialization is an explicit step handled by `EnvironmentLoader`. Following this order ensures that environment variables are available when PHP configuration files are loaded.
 
 ## Environment loading
 
@@ -81,7 +193,7 @@ $loaded = $environment->isLoaded();
 The `load()` method accepts:
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `$path` | `string` | — | Directory containing the `.env` file. |
 | `$requiredFile` | `bool` | `false` | When `true`, the `.env` file is required. When `false`, a missing file is allowed. |
 
@@ -114,7 +226,7 @@ The first source containing the key takes precedence. The default is returned on
 ```php
 $databaseName = Env::get(
     'DB_DATABASE',
-    static fn (): string => 'application_' . 'default'
+    static fn (): string => 'application_default'
 );
 ```
 
@@ -131,7 +243,7 @@ if (Env::has('APP_KEY')) {
 String values are normalized case-insensitively for the following representations:
 
 | Environment value | Result |
-|---|---|
+| --- | --- |
 | `true` or `(true)` | `true` |
 | `false` or `(false)` | `false` |
 | `null` or `(null)` | `null` |
