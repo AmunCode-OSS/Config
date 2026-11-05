@@ -1,5 +1,7 @@
 # AmunCode Config
 
+[![PHPUnit Tests](https://github.com/AmunCode-OSS/Config/actions/workflows/tests.yml/badge.svg)](https://github.com/AmunCode-OSS/Config/actions/workflows/tests.yml)
+
 A lightweight configuration and environment-loading library for PHP applications.
 
 AmunCode Config provides a small set of focused classes for loading environment variables from a `.env` file, reading environment values, loading PHP configuration files, and accessing configuration values with dot notation.
