@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         dependencies: ['lowest', 'highest']
-        php-version: ['8.4', '8.5']
+        php-version: ['8.4.1', '8.5']
     timeout-minutes: 10
 name: PHPUnit Tests
 'on':
