@@ -5,7 +5,7 @@ concurrency:
 jobs:
   tests:
     name: PHP ${{ matrix.php-version }} - ${{ matrix.dependencies }} dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
